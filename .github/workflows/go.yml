@@ -106,6 +106,7 @@ jobs:
           cd test_project
           kratos new helloworld
           cd helloworld
+          go get -v -t -d ./...
           make init
           make proto
           mkdir -p bin/ && go build -o ./bin/ ./...
