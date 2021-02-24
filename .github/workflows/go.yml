@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        go-version: ["^1.15.8"]
+        go-version: ["^1.15"]
         os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
@@ -65,7 +65,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        go-version: ["^1.15.8"]
+        go-version: ["^1.15"]
         os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
