@@ -20,7 +20,6 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go-version }}
-        id: go
       - name: Set up Env
         run: |
           echo "GOPATH=$(go env GOPATH)" >> $GITHUB_ENV
@@ -68,7 +67,6 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go-version }}
-        id: go
       - name: Set up Env
         run: |
           echo "GOPATH=$(go env GOPATH)" >> $GITHUB_ENV
