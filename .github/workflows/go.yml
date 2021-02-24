@@ -50,6 +50,9 @@ jobs:
         with:
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
           version: v1.29
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
       - name: Build
         run: go build ./...
       - name: Test
@@ -95,6 +98,7 @@ jobs:
             ${{ runner.os }}-go-
       - name: Get dependencies
         run: |
+          go get -v -t -d ./...
           wget https://github.com/protocolbuffers/protobuf/releases/download/v3.15.2/protoc-3.15.2-linux-x86_64.zip
           unzip protoc-3.15.2-linux-x86_64.zip
           chmod +x bin/protoc
@@ -106,7 +110,6 @@ jobs:
           cd test_project
           kratos new helloworld
           cd helloworld
-          go get -v -t -d ./...
           make init
           make proto
           mkdir -p bin/ && go build -o ./bin/ ./...
