@@ -97,11 +97,20 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-      - name: Get dependencies
+      - name: Get Linux dependencies
+        if: runner.os == 'Linux'
         run: |
           go get -v -t -d ./...
           wget https://github.com/protocolbuffers/protobuf/releases/download/v3.15.2/protoc-3.15.2-linux-x86_64.zip
           unzip protoc-3.15.2-linux-x86_64.zip
+          chmod +x bin/protoc
+          sudo mv bin/protoc /usr/local/bin
+      - name: Get macOS dependencies
+        if: runner.os == 'macOS'
+        run: |
+          go get -v -t -d ./...
+          wget https://github.com/protocolbuffers/protobuf/releases/download/v3.15.2/protoc-3.15.2-osx-x86_64.zip
+          unzip protoc-3.15.2-osx-x86_64.zip
           chmod +x bin/protoc
           sudo mv bin/protoc /usr/local/bin
       - name: Run
