@@ -24,6 +24,11 @@ type Binding interface {
 	Bind(*http.Request, interface{}) error
 }
 
+// BindPathParameter HTTP path parameters bind the request interface.
+type BindPathParameter interface {
+	PathParameter(map[string]string) (func(), error)
+}
+
 // StructValidator http validator interface.
 type StructValidator interface {
 	// ValidateStruct can receive any kind of type and it should never panic, even if the configuration is not right.

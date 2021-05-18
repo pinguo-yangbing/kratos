@@ -20,10 +20,27 @@ func (f formBinding) Bind(req *http.Request, obj interface{}) error {
 	if err := req.ParseForm(); err != nil {
 		return errors.WithStack(err)
 	}
+
 	if err := mapForm(obj, req.Form); err != nil {
 		return err
 	}
 	return validate(obj)
+}
+
+func (f formBinding) PathParameter(req *http.Request, pathData map[string]string) (func(),error) {
+	if err := req.ParseForm(); err != nil {
+		return nil,errors.WithStack(err)
+	}
+
+	for field, value := range pathData {
+		req.Form.Set(field, value)
+	}
+
+	return func() {
+		for field := range pathData {
+			req.Form.Del(field)
+		}
+	},nil
 }
 
 func (f formPostBinding) Name() string {
@@ -39,6 +56,8 @@ func (f formPostBinding) Bind(req *http.Request, obj interface{}) error {
 	}
 	return validate(obj)
 }
+
+
 
 func (f formMultipartBinding) Name() string {
 	return "multipart/form-data"

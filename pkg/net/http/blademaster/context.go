@@ -9,11 +9,10 @@ import (
 	"sync"
 	"text/template"
 
-	"github.com/go-kratos/kratos/pkg/net/metadata"
-
 	"github.com/go-kratos/kratos/pkg/ecode"
 	"github.com/go-kratos/kratos/pkg/net/http/blademaster/binding"
 	"github.com/go-kratos/kratos/pkg/net/http/blademaster/render"
+	"github.com/go-kratos/kratos/pkg/net/metadata"
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/gogo/protobuf/types"
@@ -367,10 +366,45 @@ func (c *Context) Bind(obj interface{}) error {
 	return c.mustBindWith(obj, b)
 }
 
+// pathFieldData gets path parameters and values
+func (c *Context) pathData() map[string]string {
+	if strings.Index(c.RoutePath, ":") < 1 {
+		return nil
+	}
+
+	fieldsData := make(map[string]string)
+	tmp := strings.Split(strings.Trim(c.RoutePath, "/"), "/")
+	for _, v := range tmp {
+		if strings.Index(v, ":") != 0 {
+			continue
+		}
+
+		field := strings.TrimLeft(v, ":")
+		fieldsData[field] = c.Params.ByName(field)
+	}
+
+	return fieldsData
+}
+
 // mustBindWith binds the passed struct pointer using the specified binding engine.
 // It will abort the request with HTTP 400 if any error ocurrs.
 // See the binding package.
 func (c *Context) mustBindWith(obj interface{}, b binding.Binding) (err error) {
+	//if pathFieldsData := c.pathFieldsData(); pathFieldsData != nil {
+	//	defer binding.PathParameter(pathFieldsData, c.Request, b)()
+	//}
+	//
+	if bpp, ok := b.(binding.BindPathParameter); ok {
+		if pathData := c.pathData(); pathData != nil {
+			recoverFunc, err := bpp.PathParameter(pathData)
+			if err != nil {
+				return err
+			}
+
+			defer recoverFunc()
+		}
+	}
+
 	if err = b.Bind(c.Request, obj); err != nil {
 		c.Error = ecode.RequestErr
 		c.Render(http.StatusOK, render.JSON{
@@ -380,6 +414,7 @@ func (c *Context) mustBindWith(obj interface{}, b binding.Binding) (err error) {
 		})
 		c.Abort()
 	}
+
 	return
 }
 
